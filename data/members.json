@@ -1,0 +1,59 @@
+{
+    "families": [
+        {
+            "id": 1,
+            "name": "Spotify Family #1",
+            "type": "spotify",
+            "maxMembers": 6
+        },
+        {
+            "id": "695de82eee49a",
+            "name": "YouTube Family #1",
+            "type": "youtube",
+            "maxMembers": 6
+        },
+        {
+            "id": "695de838f27d4",
+            "name": "Spotify Family #2",
+            "type": "spotify",
+            "maxMembers": 6
+        },
+        {
+            "id": "695de84d6dd89",
+            "name": "YouTube Family #2",
+            "type": "youtube",
+            "maxMembers": 6
+        },
+        {
+            "id": "695de85f9453b",
+            "name": "YouTube Family #3",
+            "type": "youtube",
+            "maxMembers": 6
+        },
+        {
+            "id": "695e2fbebfcc3",
+            "name": "Spotify Family #3",
+            "type": "spotify",
+            "maxMembers": 6,
+            "members": []
+        }
+    ],
+    "members": [
+        {
+            "id": 1,
+            "familyId": 1,
+            "name": "Member A",
+            "status": "paid",
+            "month": "January",
+            "lastPaidDate": 1767721862779
+        },
+        {
+            "id": 1767721267450,
+            "familyId": 1,
+            "name": "Korakot",
+            "status": "paid",
+            "month": "January",
+            "lastPaidDate": 1767721865265
+        }
+    ]
+}

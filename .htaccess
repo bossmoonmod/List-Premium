@@ -1,0 +1,19 @@
+# ป้องกันการเข้าถึงไฟล์ข้อมูล
+<Files "members.json">
+    Require all denied
+</Files>
+
+# ป้องกันการเข้าถึงไฟล์ config
+<FilesMatch "\.(json|md)$">
+    Require all denied
+</FilesMatch>
+
+# อนุญาตเฉพาะ api.php
+<FilesMatch "^api\.php$">
+    Require all granted
+</FilesMatch>
+
+# บังคับใช้ HTTPS (ถ้า CloudPanel รองรับ)
+# RewriteEngine On
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]

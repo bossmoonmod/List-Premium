@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Family Manager</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        .toggle-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 0.3rem 0.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.7rem;
+        }
+
+        .toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .icon-btn {
+            background: none;
+            border: none;
+            color: #aaa;
+            cursor: pointer;
+            transition: color 0.3s;
+            padding: 5px;
+        }
+
+        .icon-btn:hover {
+            color: #fff;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        #lock-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0f172a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        #pin-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 1rem;
+            color: #fff;
+            font-size: 1.2rem;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 1rem;
+            outline: none;
+            width: 300px;
+            max-width: 90%;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+            backdrop-filter: blur(5px);
+        }
+
+        .profile-card {
+            background: #1e293b;
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            width: 90%;
+            max-width: 350px;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .profile-img {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 3px solid #3b82f6;
+            margin-bottom: 1rem;
+            object-fit: cover;
+            background: #0f172a;
+        }
+
+        .profile-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #fff;
+        }
+
+        .profile-link-btn {
+            display: inline-block;
+            background: #1877f2;
+            color: white;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            margin-top: 1rem;
+            transition: background 0.3s;
+        }
+
+        .profile-link-btn:hover {
+            background: #166fe5;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 1.5rem;
+            color: #aaa;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Lock Screen -->
+    <div id="lock-screen">
+        <h2 style="margin-bottom: 1rem;">Admin PIN</h2>
+        <input type="password" id="pin-input" placeholder="Enter PIN">
+        <button class="filter-btn" onclick="checkPin()">Unlock</button>
+        <p id="login-status" style="margin-top:1rem;color:#ef4444;font-size:0.9rem;"></p>
+    </div>
+
+    <!-- Profile Modal (Hidden by default) -->
+    <div id="profile-modal" class="modal-overlay hidden">
+        <div class="profile-card">
+            <span class="close-modal" onclick="closeProfile()">×</span>
+            <img id="modal-img" src="" alt="Profile" class="profile-img">
+            <h3 id="modal-name" class="profile-name">Member Name</h3>
+            <a id="modal-link" href="#" target="_blank" class="profile-link-btn">
+                <i class="fa-brands fa-facebook"></i> Go to Facebook
+            </a>
+            <p id="modal-no-link" style="color:#666;margin-top:1rem;display:none;">No Facebook link provided</p>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="background-globes">
+        <div class="globe globe-1"></div>
+        <div class="globe globe-2"></div>
+        <div class="globe globe-3"></div>
+    </div>
+
+    <div class="container hidden" id="admin-content">
+        <header>
+            <div class="logo-container"><img src="logo.png" alt="Logo" class="site-logo">
+                <h1>Family Manager</h1>
+            </div>
+            <p class="subtitle">Create Families & Manage Members</p>
+        </header>
+
+        <!-- Create Family Toolbar -->
+        <div class="admin-toolbar">
+            <div class="form-group"><label>Family Name</label><input type="text" id="new-fam-name"
+                    placeholder="E.g. Spotify Team A"></div>
+            <div class="form-group"><label>Type</label><select id="new-fam-type">
+                    <option value="spotify">Spotify</option>
+                    <option value="youtube">YouTube</option>
+                </select></div>
+            <div class="form-group"><label>Max Members</label><input type="number" id="new-fam-limit" value="5"></div>
+            <button class="btn-primary" onclick="createFamily()">+ Create Family</button>
+        </div>
+
+        <div id="family-list"></div>
+    </div>
+
+    <script>
+        // Check protocol
+        if (window.location.protocol === 'file:') {
+            alert("⚠️ ผิดพลาด: ห้ามเปิดไฟล์นี้โดยตรง! \nกรุณาเข้าผ่านลิงค์: http://localhost:8000/admin.html");
+        }
+
+        // Configuration
+        const API_URL = 'api.php';
+        let currentPin = '';
+        let dbData = { families: [], members: [] };
+
+        // 1. Authentication
+        async function checkPin() {
+            const pin = document.getElementById('pin-input').value;
+            const status = document.getElementById('login-status');
+            status.textContent = 'Checking...';
+
+            try {
+                const res = await fetch(API_URL + '?action=login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ pin })
+                });
+                const data = await res.json();
+
+                if (data.success) {
+                    currentPin = pin;
+                    document.getElementById('lock-screen').classList.add('hidden');
+                    document.getElementById('admin-content').classList.remove('hidden');
+                    loadData();
+                } else {
+                    status.textContent = data.error || 'Incorrect PIN';
+                }
+            } catch (e) {
+                status.textContent = 'Connection Error: ' + e.message;
+            }
+        }
+
+        // 2. Fetch Helper
+        async function api(action, method = 'GET', body = null) {
+            try {
+                const options = {
+                    method: method,
+                    headers: { 'x-admin-pin': currentPin, 'Content-Type': 'application/json' }
+                };
+                if (body) options.body = JSON.stringify(body);
+
+                let url = `${API_URL}?action=${action}`;
+                if (method === 'DELETE') url += '&' + body;
+
+                const res = await fetch(url, options);
+                let data = await res.json();
+
+                if (!data.success) throw new Error(data.error || 'Unknown API Error');
+                return data;
+            } catch (e) {
+                Swal.fire({ icon: 'error', title: 'Error', text: e.message });
+                throw e;
+            }
+        }
+
+        // 3. Actions
+        async function loadData() {
+            try {
+                dbData = await api('data');
+                render();
+            } catch (e) { console.error(e); }
+        }
+
+        async function createFamily() {
+            const name = document.getElementById('new-fam-name').value;
+            const type = document.getElementById('new-fam-type').value;
+            const max = document.getElementById('new-fam-limit').value;
+
+            if (!name) return Swal.fire('Error', 'Please enter a name', 'warning');
+
+            try {
+                await api('createFamily', 'POST', { name, type, maxMembers: max });
+                document.getElementById('new-fam-name').value = '';
+                loadData();
+                Swal.fire({ icon: 'success', title: 'Created!', timer: 1500, showConfirmButton: false });
+            } catch (e) { }
+        }
+
+        async function deleteFamily(id) {
+            Swal.fire({
+                title: 'Are you sure?', text: "Delete this family?", icon: 'warning',
+                showCancelButton: true, confirmButtonText: 'Yes'
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try { await api('deleteFamily', 'DELETE', 'id=' + encodeURIComponent(id)); loadData(); } catch (e) { }
+                }
+            });
+        }
+
+        async function addMember(familyId) {
+            const { value: formValues } = await Swal.fire({
+                title: 'Add Member',
+                html:
+                    '<input id="swal-name" class="swal2-input" placeholder="Name">' +
+                    '<input id="swal-fb" class="swal2-input" placeholder="Facebook Profile Link (Optional)">' +
+                    '<input id="swal-img" class="swal2-input" placeholder="Custom Image URL (Optional)">',
+                focusConfirm: false,
+                showCancelButton: true,
+                preConfirm: () => {
+                    return [
+                        document.getElementById('swal-name').value,
+                        document.getElementById('swal-fb').value,
+                        document.getElementById('swal-img').value
+                    ]
+                }
+            });
+
+            if (formValues) {
+                const [name, fbLink, imgUrl] = formValues;
+                if (!name) return;
+                try {
+                    await api('addMember', 'POST', { familyId, name, fb_link: fbLink, image_url: imgUrl });
+                    loadData();
+                } catch (e) { }
+            }
+        }
+
+        async function editMember(memberId, currentName, currentLink, currentImg) {
+            const { value: formValues } = await Swal.fire({
+                title: 'Edit Member',
+                html:
+                    '<input id="swal-name-edit" class="swal2-input" placeholder="Name" value="' + currentName + '">' +
+                    '<input id="swal-fb-edit" class="swal2-input" placeholder="Facebook Link" value="' + (currentLink || '') + '">' +
+                    '<input id="swal-img-edit" class="swal2-input" placeholder="Custom Image URL" value="' + (currentImg || '') + '">',
+                focusConfirm: false,
+                showCancelButton: true,
+                preConfirm: () => {
+                    return [
+                        document.getElementById('swal-name-edit').value,
+                        document.getElementById('swal-fb-edit').value,
+                        document.getElementById('swal-img-edit').value
+                    ]
+                }
+            });
+
+            if (formValues) {
+                const [name, fbLink, imgUrl] = formValues;
+                if (!name) return;
+                try {
+                    await api('updateMember', 'POST', { id: memberId, name, fb_link: fbLink, image_url: imgUrl });
+                    loadData();
+                } catch (e) { }
+            }
+        }
+
+
+
+        function showProfile(member) {
+            const modal = document.getElementById('profile-modal');
+            const img = document.getElementById('modal-img');
+            const name = document.getElementById('modal-name');
+            const linkBtn = document.getElementById('modal-link');
+            const noLinkMsg = document.getElementById('modal-no-link');
+
+            name.textContent = member.name;
+
+            // Priority: 1. Custom Image URL, 2. Facebook Graph, 3. UI Avatars
+            let imgUrl = member.image_url;
+
+            if (!imgUrl && member.fb_link) {
+                // Try to resolve FB image if no custom image provided
+                let cleanLink = member.fb_link.replace(/\/$/, "");
+                let idMatch = cleanLink.match(/profile\.php\?id=([0-9]+)/);
+                let userMatch = cleanLink.match(/facebook\.com\/([^\/\?]+)/);
+
+                if (idMatch && idMatch[1]) {
+                    imgUrl = `https://graph.facebook.com/${idMatch[1]}/picture?type=large`;
+                } else if (userMatch && userMatch[1] && userMatch[1] !== 'profile.php') {
+                    // Note: This often fails without token, hence the custom input
+                    imgUrl = `https://graph.facebook.com/${userMatch[1]}/picture?type=large`;
+                }
+            }
+
+            if (!imgUrl) {
+                imgUrl = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(member.name) + '&background=random&size=200';
+            }
+
+            img.onerror = () => {
+                this.onerror = null;
+                this.src = 'https://ui-avatars.com/api/?name=' + encodeURIComponent(member.name) + '&background=random&size=200';
+            };
+
+            img.src = imgUrl;
+
+            if (member.fb_link) {
+                linkBtn.href = member.fb_link;
+                linkBtn.style.display = 'inline-block';
+                noLinkMsg.style.display = 'none';
+            } else {
+                linkBtn.style.display = 'none';
+                noLinkMsg.style.display = 'block';
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeProfile() {
+            document.getElementById('profile-modal').classList.add('hidden');
+        }
+
+        async function deleteMember(id) {
+            if (!confirm('Delete this member?')) return;
+            try { await api('deleteMember', 'DELETE', 'id=' + encodeURIComponent(id)); loadData(); } catch (e) { }
+        }
+
+        async function toggleStatus(memberId, currentStatus) {
+            const newStatus = currentStatus === 'paid' ? 'unpaid' : 'paid';
+            try { await api('toggleStatus', 'POST', { memberId, status: newStatus }); loadData(); } catch (e) { }
+        }
+
+        // 4. Render
+        function render() {
+            const list = document.getElementById('family-list');
+            list.innerHTML = '';
+
+            if (!dbData.families) dbData.families = [];
+
+            dbData.families.forEach(fam => {
+                const famMembers = dbData.members.filter(m => m.familyId == fam.id);
+                const isFull = famMembers.length >= fam.maxMembers;
+                const icon = fam.type === 'spotify' ? 'fa-spotify' : 'fa-youtube';
+                const color = fam.type === 'spotify' ? '#1db954' : '#ff0000';
+
+                const div = document.createElement('div');
+                div.className = 'family-section';
+                div.style.background = 'rgba(255,255,255,0.02)';
+                div.style.padding = '1rem';
+                div.style.borderRadius = '12px';
+                div.style.marginBottom = '1rem';
+
+                let html = `
+                    <div class="family-header" style="display:flex;justify-content:space-between;align-items:center;">
+                        <div class="family-title" style="display:flex;align-items:center;gap:10px;">
+                            <i class="fa-brands ${icon}" style="color:${color};font-size:1.5rem;"></i>
+                            <h3 style="margin:0;">${fam.name} <span style="font-size:0.8rem;color:#666">(${famMembers.length}/${fam.maxMembers})</span></h3>
+                        </div>
+                        <button class="btn-danger" style="padding:5px 10px;font-size:0.8rem;" onclick="deleteFamily('${fam.id}')">Delete</button>
+                    </div>
+                    <div class="member-list-container" style="margin-top:1rem;">
+                `;
+
+                famMembers.forEach(m => {
+                    const isPaid = m.status === 'paid';
+                    // Pass member object to global scope map or valid JSON string
+                    // We'll use ID to find member in array for showProfile
+                    html += `
+                        <div class="member-card" style="display:flex;justify-content:space-between;align-items:center;background:rgba(255,255,255,0.05);padding:0.8rem;border-radius:8px;margin-bottom:0.5rem;">
+                            <div class="member-info" style="display:flex;align-items:center;gap:10px;cursor:pointer;" onclick="showProfileById('${m.id}')">
+                                <div style="width:30px;height:30px;background:#333;border-radius:50%;display:flex;justify-content:center;align-items:center;overflow:hidden;">
+                                    ${(function () {
+                            // Priority: 1. Custom 2. Facebook (Simple) 3. UI Avatars
+                            let img = m.image_url;
+                            if (!img && m.fb_link) {
+                                let clean = m.fb_link.replace(/\/$/, "");
+                                let id = clean.match(/profile\.php\?id=([0-9]+)/);
+                                let user = clean.match(/facebook\.com\/([^\/\?]+)/);
+                                if (id && id[1]) img = `https://graph.facebook.com/${id[1]}/picture?type=large`;
+                                else if (user && user[1] && user[1] !== 'profile.php') img = `https://graph.facebook.com/${user[1]}/picture?type=large`;
+                            }
+                            if (!img) img = `https://ui-avatars.com/api/?name=${encodeURIComponent(m.name)}&background=random&size=35`;
+                            return `<img src="${img}" style="width:100%;height:100%;object-fit:cover;" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(m.name)}&background=random&size=35'">`;
+                        })()}
+                                </div>
+                                <span class="member-name" style="font-weight:600;">${m.name}</span>
+                                ${m.fb_link ? '<i class="fa-brands fa-facebook" style="color:#1877f2;font-size:0.8rem;"></i>' : ''}
+                            </div>
+                            <div style="display:flex;gap:0.5rem;align-items:center">
+                                <button class="icon-btn" onclick="openEdit('${m.id}')"><i class="fa-solid fa-pen"></i></button>
+                                <button class="toggle-btn" 
+                                    style="color:${isPaid ? '#22c55e' : '#ef4444'}" 
+                                    onclick="toggleStatus('${m.id}', '${m.status}')">
+                                    ${isPaid ? 'PAID' : 'UNPAID'}
+                                </button>
+                                <button class="btn-danger" style="padding:2px 8px;font-size:0.7rem;" onclick="deleteMember('${m.id}')">X</button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += '</div>';
+
+                if (!isFull) {
+                    html += `
+                        <div class="add-member-form" style="display:flex;gap:10px;margin-top:1rem;">
+                            <button class="toggle-btn" style="flex:1;text-align:center;" onclick="addMember('${fam.id}')">+ Add Member</button>
+                        </div>
+                    `;
+                } else {
+                    html += `<div style="padding:1rem 0;color:#ef4444;font-size:0.9rem;text-align:center;">Family Full</div>`;
+                }
+
+                div.innerHTML = html;
+                list.appendChild(div);
+            });
+        }
+
+        // Helpers for HTML event binding
+        window.showProfileById = function (id) {
+            const member = dbData.members.find(m => m.id === id);
+            if (member) showProfile(member);
+        }
+
+        window.openEdit = function (id) {
+            const member = dbData.members.find(m => m.id === id);
+            if (member) editMember(id, member.name, member.fb_link, member.image_url);
+        }
+    </script>
+</body>
+
+</html>

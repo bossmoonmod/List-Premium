@@ -1,0 +1,11 @@
+.DS_Store
+Thumbs.db
+*.log
+database.db
+api_sqlite.php
+api_old.php
+api_json_robust.php
+admin_production.html
+migrate.php
+check_server.php
+.gemini/
