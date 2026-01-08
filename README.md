@@ -6,7 +6,7 @@
 
 A modern, anime-inspired web application for managing Spotify & YouTube family memberships. Features a premium UI, background music integration, and a secure admin panel.
 
-<img src="https://ui-avatars.com/api/?name=Premium+List&background=0D8ABC&color=fff&size=512&font-size=0.33" width="100%" height="200" style="object-fit:cover; border-radius:10px;">
+<img src="https://i.postimg.cc/SK9rZz7K/d-sin-th-y-ngmi-di-t-ngch-x.png" width="100%" height="200" style="object-fit:cover; border-radius:10px;">
 
 ## ✨ Key Features
 
