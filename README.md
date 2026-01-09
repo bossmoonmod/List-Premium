@@ -71,4 +71,4 @@ Developed by **Boss Korakot**
 *Project Repository for List-Premium System*
 
 ---
-*Generated with ❤️ by Antigravity*
+*Free Project ❤️ by Boss Korakot*
